@@ -16,14 +16,17 @@ public:
     {
         connector->Update();
         motorController->runMotors();
-        if(statusCode = STATUS::MOTOR){
-            motorController->ExecuteInstruction()
+        if(statusCode == STATUS::MOTOR){
+          Serial.println(instruction);
+          motorController->ExecuteInstruction(instruction);
+          statusCode = STATUS::IDLE;
+          instruction = "";
         }
-        if (statusCode == STATUS::SENSOR)
+        if (statusCode == STATUS::IDLE || statusCode == STATUS::SENSOR)
         {
-            float values[6] = 
-            sensorController->getSensorValues(values*);
-            connector->SendSensor(values[0],values[1], values[2], values[3], values[4], values[5]);
+            float values[6];
+            sensorController->getSensorValues(values);
+            connector->SendSensor(String(values[0]),String(values[1]), String(values[2]), String(values[3]), String(values[4]), String(values[5]));
         }
         motorController->runMotors();
     }
@@ -34,6 +37,7 @@ public:
     }
 
     void ChangeLights(String inst){
+      Serial.println(inst);
         if (statusCode != STATUS::MOTOR){
             statusCode = STATUS::MOTOR;
         }
@@ -41,6 +45,7 @@ public:
     }
 
     void ChangeMotor(String inst){
+      Serial.println("lalala");
         if (statusCode != STATUS::MOTOR){
             statusCode = STATUS::MOTOR;
         }

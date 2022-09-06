@@ -19,11 +19,16 @@ AccelStepper stU(1, 5, 11); // STEP, DIR
 #define ServoAmpsPIN PA4
 #define homeButtonPIN PB13
 
-#define ONE_WIRE_BUS PA15
 
+
+
+  
 class SensorController
 {
 public:
+    OneWire oneWire = OneWire(15);
+    DallasTemperature TempSensors = DallasTemperature(&oneWire);
+    
     void runMotors()
     {
     }
@@ -36,6 +41,8 @@ public:
         pinMode(ServoVoltagePIN, INPUT);
         pinMode(ServoAmpsPIN, INPUT);
         pinMode(homeButtonPIN, INPUT);
+        
+        TempSensors.begin();
     }
 
     float getAverage(int pin)
@@ -53,17 +60,15 @@ public:
 
     void getSensorValues(float *values)
     {
-        values[0] = (getAverage(STV_PIN)-0) * (45 / 3520.0))
-        values[1] = (getAverage(ServoVoltagePIN) * (5.0 / 3970.0);
-        values[2] = getAverage(twelveV_PIN) * (12 / 3885.0);
-        sensors.requestTemperatures();
-        values[3] = sensors.getTempCByIndex(0);
-        values[4] = sensors.getTempCByIndex(1);
-        values[5] = sensors.getTempCByIndex(2);
-        return values;
+        values[3] = (getAverage(STV_PIN)-0) * (45 / 3520.0);
+        values[4] = getAverage(ServoVoltagePIN) * (5.0 / 3970.0);
+        values[5] = getAverage(twelveV_PIN) * (12 / 3885.0);
+        TempSensors.requestTemperatures();
+        values[0] = TempSensors.getTempCByIndex(0);
+        values[1] = TempSensors.getTempCByIndex(1);
+        values[2] = TempSensors.getTempCByIndex(2);
+        
     }
 
-private:
-    OneWire oneWire(ONE_WIRE_BUS);
-    DallasTemperature sensors(&oneWire);
+
 };

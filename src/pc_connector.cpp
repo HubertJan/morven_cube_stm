@@ -24,9 +24,16 @@ public:
     {
         arduino = ard;
         baud = b;
-        Serial.begin(9600);
-        while (!Serial.available())
-        {
+        Serial.begin(115200);
+        bool stop = false;
+        while(!stop){
+          Serial.println("TRY");
+          delay(100);
+          char inChar = (char)Serial.read();
+          if (inChar == '\n')
+            {
+                stop = true;
+            }
         }
         Serial.println("Started");
     }
@@ -64,25 +71,28 @@ private:
     void SetSensor(String _)
     {
         arduino->SetSensorMode();
+        Serial.println("response;");
+        
+        delay(100);
     }
 
     void ChangeLights(String inst)
     {
+      Serial.println("pc");
         arduino->ChangeLights(inst);
+        Serial.println("response;");
+        delay(100);
     }
 
     void ChangeMotor(String inst)
     {
+        Serial.println("response;");
         arduino->ChangeMotor(inst);
-    }
-
-    void SendProgramAsResponse(String prgIns, String prgId)
-    {
-        String responseString = String("response;");
-        responseString.concat(DataToString("programInstructions", prgIns)).concat(DataToString("programId", prgId));
-        Serial.println(responseString);
+        Serial.println("response;");
         delay(100);
     }
+
+
 
     int CountArguments(String inp)
     {
@@ -144,13 +154,11 @@ private:
     typedef void (PCConnector::*CommandHandler)(const String);
     const String cdKeywords[3] = {
         "sensor",
-        "light",
         "motor",
     };
     const CommandHandler cdFunctions[3] = {
         &PCConnector::SetSensor,
         &PCConnector::ChangeLights,
-        &PCConnector::ChangeMotor,
     };
 
     String receivedString = "";
